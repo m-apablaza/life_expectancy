@@ -1,0 +1,390 @@
+---
+title: "Life Expectancy"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    theme: flatly
+---
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(crosstalk)
+library(plotly)
+library(DT)
+
+df <- read.table(text = "
+Entity	Year	LifeExp
+Americas	1770	34.8
+Americas	1830	34.8
+Americas	1850	35.1
+Americas	1870	35.1
+Americas	1900	41
+Americas	1913	45.1
+Americas	1950	56.5028
+Americas	1951	56.9204
+Americas	1952	57.402
+Americas	1953	57.906
+Americas	1954	58.6525
+Americas	1955	58.9932
+Americas	1956	59.3801
+Americas	1957	59.6062
+Americas	1958	60.0883
+Americas	1959	60.5007
+Americas	1960	60.7932
+Americas	1961	61.2684
+Americas	1962	61.4211
+Americas	1963	61.5399
+Americas	1964	61.9124
+Americas	1965	62.1123
+Americas	1966	62.3322
+Americas	1967	62.67
+Americas	1968	62.7056
+Americas	1969	63.0295
+Americas	1970	63.1495
+Americas	1971	63.8157
+Americas	1972	64.0001
+Americas	1973	64.3473
+Americas	1974	64.8219
+Americas	1975	65.4098
+Americas	1976	65.7058
+Americas	1977	66.2896
+Americas	1978	66.6343
+Americas	1979	67.0668
+Americas	1980	67.247
+Americas	1981	67.6911
+Americas	1982	68.0177
+Americas	1983	68.4306
+Americas	1984	68.7457
+Americas	1985	68.8882
+Americas	1986	69.3281
+Americas	1987	69.6289
+Americas	1988	69.8726
+Americas	1989	70.2467
+Americas	1990	70.5909
+Americas	1991	70.8608
+Americas	1992	71.146
+Americas	1993	71.251
+Americas	1994	71.5582
+Americas	1995	71.8289
+Americas	1996	72.1831
+Americas	1997	72.5468
+Americas	1998	72.7124
+Americas	1999	72.981
+Americas	2000	73.247
+Americas	2001	73.4795
+Americas	2002	73.758
+Americas	2003	74.0244
+Americas	2004	74.3916
+Americas	2005	74.6213
+Americas	2006	74.9224
+Americas	2007	75.1515
+Americas	2008	75.2986
+Americas	2009	75.5602
+Americas	2010	75.4472
+Americas	2011	75.9343
+Americas	2012	76.1301
+Americas	2013	76.2643
+Americas	2014	76.4082
+Americas	2015	76.472
+Americas	2016	76.4312
+Americas	2017	76.5049
+Americas	2018	76.6965
+Americas	2019	76.857
+Americas	2020	74.9717
+Americas	2021	73.8796
+Americas	2022	76.1444
+Americas	2023	77.2922
+Chile	1900	29
+Chile	1902	32
+Chile	1907	30.5
+Chile	1910	30
+Chile	1912	31.9
+Chile	1917	32.2
+Chile	1920	31
+Chile	1922	31.6
+Chile	1927	37
+Chile	1930	35
+Chile	1932	38.7
+Chile	1937	39.1
+Chile	1940	38
+Chile	1942	44
+Chile	1947	47.9
+Chile	1950	53.1513
+Chile	1951	53.5373
+Chile	1952	53.929
+Chile	1953	54.3125
+Chile	1954	54.7141
+Chile	1955	54.9278
+Chile	1956	55.4818
+Chile	1957	55.7734
+Chile	1958	56.2881
+Chile	1959	56.6425
+Chile	1960	57.2163
+Chile	1961	57.3091
+Chile	1962	57.8108
+Chile	1963	58.3487
+Chile	1964	58.8118
+Chile	1965	59.4726
+Chile	1966	60.3733
+Chile	1967	61.0536
+Chile	1968	61.6798
+Chile	1969	62.341
+Chile	1970	62.6344
+Chile	1971	63.0715
+Chile	1972	63.717
+Chile	1973	64.42
+Chile	1974	65.0853
+Chile	1975	66.0374
+Chile	1976	66.8193
+Chile	1977	67.5294
+Chile	1978	68.0421
+Chile	1979	68.8581
+Chile	1980	69.4748
+Chile	1981	69.8222
+Chile	1982	70.291
+Chile	1983	70.8302
+Chile	1984	71.2153
+Chile	1985	71.6153
+Chile	1986	72.0606
+Chile	1987	72.4662
+Chile	1988	72.7881
+Chile	1989	73.1876
+Chile	1990	73.6752
+Chile	1991	74.0824
+Chile	1992	74.3673
+Chile	1993	74.6793
+Chile	1994	74.973
+Chile	1995	75.2984
+Chile	1996	75.5548
+Chile	1997	75.8262
+Chile	1998	76.3241
+Chile	1999	76.7382
+Chile	2000	77.1276
+Chile	2001	77.5798
+Chile	2002	77.8397
+Chile	2003	77.8841
+Chile	2004	78.2765
+Chile	2005	78.4589
+Chile	2006	78.5328
+Chile	2007	78.6519
+Chile	2008	78.7518
+Chile	2009	78.8901
+Chile	2010	79.0954
+Chile	2011	79.2357
+Chile	2012	79.2211
+Chile	2013	79.5509
+Chile	2014	79.7137
+Chile	2015	80.0079
+Chile	2016	80.2949
+Chile	2017	80.6096
+Chile	2018	80.5594
+Chile	2019	80.3243
+Chile	2020	79.3488
+Chile	2021	78.8764
+Chile	2022	79.1762
+Chile	2023	81.1667
+Europe	1770	34.3
+Europe	1800	33.3
+Europe	1820	35.6
+Europe	1850	36.3
+Europe	1870	36.2
+Europe	1900	42.7
+Europe	1913	46.8
+Europe	1950	61.9599
+Europe	1951	61.8892
+Europe	1952	63.2871
+Europe	1953	64.0541
+Europe	1954	64.8764
+Europe	1955	65.6481
+Europe	1956	66.8002
+Europe	1957	66.9821
+Europe	1958	68.0391
+Europe	1959	68.26
+Europe	1960	68.7123
+Europe	1961	69.171
+Europe	1962	69.1437
+Europe	1963	69.3934
+Europe	1964	70.0254
+Europe	1965	70.0373
+Europe	1966	70.2353
+Europe	1967	70.3162
+Europe	1968	70.1489
+Europe	1969	69.9561
+Europe	1970	70.286
+Europe	1971	70.4677
+Europe	1972	70.6855
+Europe	1973	70.7999
+Europe	1974	70.9586
+Europe	1975	70.872
+Europe	1976	70.958
+Europe	1977	71.1587
+Europe	1978	71.1905
+Europe	1979	71.2803
+Europe	1980	71.3419
+Europe	1981	71.5498
+Europe	1982	71.8728
+Europe	1983	71.8697
+Europe	1984	72.0095
+Europe	1985	72.2292
+Europe	1986	72.8307
+Europe	1987	73.08
+Europe	1988	73.154
+Europe	1989	73.2036
+Europe	1990	73.1225
+Europe	1991	73.0863
+Europe	1992	72.7633
+Europe	1993	72.1081
+Europe	1994	72.0386
+Europe	1995	72.1815
+Europe	1996	72.7397
+Europe	1997	73.2985
+Europe	1998	73.555
+Europe	1999	73.319
+Europe	2000	73.4418
+Europe	2001	73.6194
+Europe	2002	73.6257
+Europe	2003	73.6757
+Europe	2004	74.1495
+Europe	2005	74.2867
+Europe	2006	74.9033
+Europe	2007	75.3079
+Europe	2008	75.6092
+Europe	2009	76.0592
+Europe	2010	76.2025
+Europe	2011	76.8703
+Europe	2012	77.0615
+Europe	2013	77.4116
+Europe	2014	77.6754
+Europe	2015	77.7767
+Europe	2016	78.1705
+Europe	2017	78.4613
+Europe	2018	78.5281
+Europe	2019	78.7588
+Europe	2020	77.6514
+Europe	2021	77.0357
+Europe	2022	78.1827
+Europe	2023	79.0594
+World	1770	28.5
+World	1800	28.5
+World	1820	29
+World	1850	29.3
+World	1870	29.7
+World	1900	32
+World	1913	34.1
+World	1950	46.3944
+World	1951	47.1259
+World	1952	48.2183
+World	1953	48.809
+World	1954	49.6514
+World	1955	50.2055
+World	1956	50.7373
+World	1957	51.0636
+World	1958	51.6151
+World	1959	49.5818
+World	1960	47.8198
+World	1961	50.3459
+World	1962	53.2416
+World	1963	53.7161
+World	1964	54.2603
+World	1965	53.9975
+World	1966	54.5644
+World	1967	55.0678
+World	1968	55.6181
+World	1969	55.9999
+World	1970	56.2664
+World	1971	56.0193
+World	1972	57.2155
+World	1973	57.6923
+World	1974	58.0614
+World	1975	58.2681
+World	1976	58.5754
+World	1977	59.1539
+World	1978	59.5129
+World	1979	60.1571
+World	1980	60.502
+World	1981	60.9187
+World	1982	61.3435
+World	1983	61.5211
+World	1984	61.8663
+World	1985	62.2092
+World	1986	62.7297
+World	1987	63.1809
+World	1988	63.3672
+World	1989	63.7817
+World	1990	63.955
+World	1991	64.0642
+World	1992	64.2879
+World	1993	64.4334
+World	1994	64.2995
+World	1995	64.8817
+World	1996	65.1995
+World	1997	65.5406
+World	1998	65.7408
+World	1999	66.0412
+World	2000	66.4333
+World	2001	66.7531
+World	2002	67.068
+World	2003	67.4015
+World	2004	67.7449
+World	2005	68.1405
+World	2006	68.6137
+World	2007	69.0316
+World	2008	69.3017
+World	2009	69.6812
+World	2010	70.089
+World	2011	70.4033
+World	2012	70.824
+World	2013	71.1417
+World	2014	71.4038
+World	2015	71.606
+World	2016	71.8768
+World	2017	72.067
+World	2018	72.3885
+World	2019	72.6093
+World	2020	71.9166
+World	2021	70.865
+World	2022	72.6398
+World	2023	73.1694
+", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+shared_df <- SharedData$new(df)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Filter
+```{r}
+filter_checkbox("Entity", "Region", shared_df, ~Entity, inline = TRUE)
+filter_slider("Year", "Year", shared_df, ~Year, step = 1, sep = "")
+```
+
+Row {data-height=600}
+-----------------------------------------------------------------------
+
+### Life Expectancy Over Time
+```{r}
+plot_ly(shared_df,
+        x = ~Year,
+        y = ~LifeExp,
+        color = ~Entity,
+        type = "scatter",
+        mode = "lines+markers",
+        marker = list(size = 4),
+        hovertemplate = "<b>%{fullData.name}</b><br>Year: %{x}<br>Life expectancy: %{y:.1f}<extra></extra>") %>%
+  layout(
+    yaxis = list(title = "Life expectancy (years)"),
+    xaxis = list(title = "Year"),
+    legend = list(orientation = "h", y = -0.2)
+  )
+```
+
+Row {data-height=300}
+-----------------------------------------------------------------------
+
+### Data
+```{r}
+DT::datatable(shared_df$data(),
+              colnames = c("Region", "Year", "Life Expectancy"),
+              options = list(pageLength = 8, scrollX = TRUE),
+              rownames = FALSE)
+```
